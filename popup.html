@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SoundCloud → Gopeed</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      width: 300px;
+      background: #1a1a1a;
+      color: #eee;
+      padding: 16px;
+    }
+
+    h2 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #ff5500;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .field { margin-top: 14px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 7px 10px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #eee;
+      font-size: 13px;
+      outline: none;
+    }
+
+    input:focus { border-color: #ff5500; }
+
+    .hint {
+      margin-top: 5px;
+      font-size: 11px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .hint a { color: #ff5500; text-decoration: none; }
+    .hint a:hover { text-decoration: underline; }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 9px;
+      background: #ff5500;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: #e64a00; }
+
+    #status {
+      margin-top: 10px;
+      font-size: 12px;
+      text-align: center;
+      color: #2ecc71;
+      min-height: 16px;
+    }
+
+    .divider {
+      margin: 16px 0 0;
+      border: none;
+      border-top: 1px solid #333;
+    }
+
+    .req {
+      margin-top: 14px;
+      font-size: 11px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .req strong { color: #888; }
+  </style>
+</head>
+<body>
+  <h2>⬇ SoundCloud → Gopeed</h2>
+  <p class="subtitle">Adds a Download button on SoundCloud track &amp; playlist pages</p>
+
+  <div class="field">
+    <label>Gopeed API port</label>
+    <input type="text" id="port" placeholder="9999" />
+    <p class="hint">
+      Default is <strong style="color:#aaa">9999</strong> — Gopeed's built-in API port.<br>
+      To check or change it: Gopeed → Settings → <em>API → Port</em>.
+    </p>
+  </div>
+
+  <div class="field">
+    <label>API token <span style="color:#555;font-weight:400">(optional)</span></label>
+    <input type="text" id="token" placeholder="leave empty if not set" />
+    <p class="hint">
+      Set only if you enabled token auth in Gopeed → Settings → <em>API → Token</em>.<br>
+      Leave empty for local Gopeed without auth.
+    </p>
+  </div>
+
+  <button id="save">Save settings</button>
+  <div id="status"></div>
+
+  <hr class="divider" />
+
+  <p class="req">
+    <strong>Also required:</strong> install the
+    <a href="https://github.com/TropinAlexey/gopeed-extension-soundcloud" target="_blank">gopeed-extension-soundcloud</a>
+    extension inside Gopeed so it can resolve SoundCloud URLs to audio streams.
+  </p>
+
+  <script src="popup.js"></script>
+</body>
+</html>
