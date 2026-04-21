@@ -10,7 +10,7 @@ Adds a native **Download** button on SoundCloud track and playlist pages. One cl
 ## Installation
 
 The extension is published to the Chrome Web Store. Install it manually:
-[SoundCloud → Gopeed chrome extension]https://chromewebstore.google.com/detail/dibaaanimijeognedjonhifkigceppbh
+[SoundCloud → Gopeed chrome extension](https://chromewebstore.google.com/detail/dibaaanimijeognedjonhifkigceppbh)
 
 ## How it works
 
