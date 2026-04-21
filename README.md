@@ -9,12 +9,8 @@ Adds a native **Download** button on SoundCloud track and playlist pages. One cl
 
 ## Installation
 
-The extension is not published to the Chrome Web Store. Install it manually:
-
-1. Download or clone this repository
-2. Open `chrome://extensions` in Chrome
-3. Enable **Developer mode** (top right toggle)
-4. Click **Load unpacked** → select the `soundcloud-gopeed-button` folder
+The extension is published to the Chrome Web Store. Install it manually:
+[SoundCloud → Gopeed chrome extension]https://chromewebstore.google.com/detail/dibaaanimijeognedjonhifkigceppbh
 
 ## How it works
 
