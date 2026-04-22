@@ -1,28 +1,25 @@
 // Injected into soundcloud.com — adds a native-looking "Download" button
-// into .sc-button-group.sc-button-group-medium, before the "More" button.
+// into every .sc-button-group.sc-button-group-medium on the page.
 
-const BUTTON_ID = 'gopeed-dl-btn';
-
-// Override only color — everything else comes from SoundCloud's own sc-button styles
 const CSS = `
-#${BUTTON_ID} {
+.gpd-btn {
   color: #ff5500 !important;
   border-color: #ff5500 !important;
 }
-#${BUTTON_ID}:hover {
+.gpd-btn:hover {
   background-color: #ff5500 !important;
   color: #fff !important;
   border-color: #ff5500 !important;
 }
-#${BUTTON_ID}.gpd-loading {
+.gpd-btn.gpd-loading {
   opacity: 0.55;
   pointer-events: none;
 }
-#${BUTTON_ID}.gpd-success {
+.gpd-btn.gpd-success {
   color: #2ecc71 !important;
   border-color: #2ecc71 !important;
 }
-#${BUTTON_ID}.gpd-error {
+.gpd-btn.gpd-error {
   color: #e74c3c !important;
   border-color: #e74c3c !important;
 }
@@ -36,12 +33,10 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-function createButton() {
+function createButton(trackUrl) {
   const btn = document.createElement('button');
-  btn.id = BUTTON_ID;
   btn.type = 'button';
-  // Reuse SoundCloud's own button classes so size/shape/font match perfectly
-  btn.className = 'sc-button sc-button-secondary sc-button-medium';
+  btn.className = 'sc-button sc-button-secondary sc-button-medium gpd-btn';
   btn.title = 'Download via Gopeed';
   btn.innerHTML = '<span class="sc-button-label">Download</span>';
 
@@ -49,13 +44,10 @@ function createButton() {
     e.preventDefault();
     e.stopPropagation();
 
-    const url = getCleanUrl();
-    if (!url) return;
-
     setState('loading', 'Loading…');
 
     try {
-      const response = await chrome.runtime.sendMessage({ type: 'CREATE_TASK', url });
+      const response = await chrome.runtime.sendMessage({ type: 'CREATE_TASK', url: trackUrl });
 
       if (response?.ok) {
         setState('success', '✓ Sent to Gopeed');
@@ -73,50 +65,53 @@ function createButton() {
   });
 
   function setState(cls, label) {
-    btn.className = `sc-button sc-button-secondary sc-button-medium gpd-${cls}`;
+    btn.className = `sc-button sc-button-secondary sc-button-medium gpd-btn gpd-${cls}`;
     btn.querySelector('.sc-button-label').textContent = label;
   }
 
   function resetState() {
-    btn.className = 'sc-button sc-button-secondary sc-button-medium';
+    btn.className = 'sc-button sc-button-secondary sc-button-medium gpd-btn';
     btn.querySelector('.sc-button-label').textContent = 'Download';
   }
 
   return btn;
 }
 
-function getCleanUrl() {
+function getTrackUrlFromGroup(group) {
+  // Walk up to the nearest track container and find its title link
+  const container = group.closest(
+    '.soundList__item, .trackItem, .sound__body, .streamContext, li'
+  );
+  if (container) {
+    const link = container.querySelector(
+      'a.soundTitle__title, a.trackItem__trackTitle, a[href][class*="title"]'
+    );
+    if (link && link.pathname.split('/').filter(Boolean).length >= 2) {
+      return new URL(link.href).origin + link.pathname;
+    }
+  }
+  // Fallback: current page URL (e.g. on a dedicated track page)
   const url = new URL(location.href);
   url.search = '';
   url.hash = '';
   return url.toString();
 }
 
-function isDownloadablePage() {
-  const segments = location.pathname.split('/').filter(Boolean);
-  return segments.length >= 2;
-}
-
 // ── Injection ─────────────────────────────────────────────────────────────────
 
-function tryInjectButton() {
-  if (!isDownloadablePage()) return;
-  if (document.getElementById(BUTTON_ID)) return;
-
-  // The exact group the user identified
-  const group = document.querySelector('.sc-button-group.sc-button-group-medium');
-  if (!group) return;
-
+function tryInjectButtons() {
   injectStyles();
-
-  const btn = createButton();
-
-  // Insert before the "More" button if present, otherwise append
-  const moreBtn = group.querySelector('.sc-button-more');
-  if (moreBtn) {
-    group.insertBefore(btn, moreBtn);
-  } else {
-    group.appendChild(btn);
+  // :not([data-gopeed]) skips already-processed groups — no duplicate buttons
+  const groups = document.querySelectorAll(
+    '.sc-button-group.sc-button-group-medium:not([data-gopeed])'
+  );
+  for (const group of groups) {
+    const trackUrl = getTrackUrlFromGroup(group);
+    if (!trackUrl) continue;
+    group.setAttribute('data-gopeed', '1');
+    const btn = createButton(trackUrl);
+    const moreBtn = group.querySelector('.sc-button-more');
+    moreBtn ? group.insertBefore(btn, moreBtn) : group.appendChild(btn);
   }
 }
 
@@ -128,14 +123,11 @@ const observer = new MutationObserver(() => {
   if (location.href !== lastUrl) {
     lastUrl = location.href;
     // Wait for React to render the new page
-    setTimeout(tryInjectButton, 800);
+    setTimeout(tryInjectButtons, 800);
   }
-
-  if (!document.getElementById(BUTTON_ID)) {
-    tryInjectButton();
-  }
+  tryInjectButtons();
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
 
-setTimeout(tryInjectButton, 1000);
+setTimeout(tryInjectButtons, 1000);
