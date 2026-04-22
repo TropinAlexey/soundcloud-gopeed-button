@@ -58,9 +58,13 @@ function createButton(trackUrl) {
         console.error('[Gopeed]', response?.error);
       }
     } catch (err) {
-      setState('error', '✗ Error');
-      setTimeout(resetState, 3500);
-      console.error('[Gopeed]', err);
+      if (err?.message?.includes('Extension context invalidated')) {
+        setState('error', '↻ Refresh page');
+      } else {
+        setState('error', '✗ Error');
+        console.error('[Gopeed]', err);
+      }
+      setTimeout(resetState, 4000);
     }
   });
 
