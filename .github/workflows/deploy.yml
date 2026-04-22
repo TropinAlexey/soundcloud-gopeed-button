@@ -15,13 +15,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Upload & publish
-        run: npx chrome-webstore-upload-cli@3 upload --auto-publish
+        run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish
         env:
           EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          ZIP_PATH: extension.zip
