@@ -49,7 +49,8 @@ async function handleCreateTask(url) {
     let path;
     if (files.length > 1 && resolved.res.name) {
       const config = await api('GET', '/config').catch(() => null);
-      if (config?.downloadDir) path = `${config.downloadDir}/${sanitize(resolved.res.name)}`;
+      const folder = sanitize(resolved.res.name);
+      if (config?.downloadDir && folder) path = `${config.downloadDir}/${folder}`;
     }
 
     // Step 2: create all tasks in one request
@@ -92,8 +93,14 @@ function createApi(port, token) {
   };
 }
 
+// The playlist title is user-controlled on SoundCloud — it must stay a single path segment
+// inside downloadDir: no separators, control chars, or a leading dot ("..", ".hidden").
 function sanitize(name) {
-  return name.replace(/[/\\?%*:|"<>]/g, '-').trim();
+  return name
+    .replace(/[/\\?%*:|"<>\x00-\x1f]/g, '-')
+    .trim()
+    .replace(/^\.+/, '')
+    .trim();
 }
 
 const NOTIFICATION_TITLES = {
