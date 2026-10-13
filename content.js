@@ -33,6 +33,12 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
+const ERROR_LABELS = {
+  offline: '✗ Gopeed not running',
+  auth: '✗ Bad API token',
+  'no-extension': '✗ Gopeed extension',
+};
+
 function createButton(trackUrl) {
   const btn = document.createElement('button');
   btn.type = 'button';
@@ -50,32 +56,35 @@ function createButton(trackUrl) {
       const response = await chrome.runtime.sendMessage({ type: 'CREATE_TASK', url: trackUrl });
 
       if (response?.ok) {
-        setState('success', '✓ Sent to Gopeed');
+        setState('success', response.count > 1 ? `✓ ${response.count} tracks sent` : '✓ Sent to Gopeed');
         setTimeout(resetState, 3000);
       } else {
-        setState('error', '✗ Error');
-        setTimeout(resetState, 3500);
+        // Full reason is in the tooltip and in a system notification from the service worker
+        setState('error', ERROR_LABELS[response?.kind] || '✗ Error', response?.error);
+        setTimeout(resetState, 6000);
         console.error('[Gopeed]', response?.error);
       }
     } catch (err) {
       if (err?.message?.includes('Extension context invalidated')) {
-        setState('error', '↻ Refresh page');
+        setState('error', '↻ Refresh page', 'The extension was updated — reload the page');
       } else {
-        setState('error', '✗ Error');
+        setState('error', '✗ Error', err?.message);
         console.error('[Gopeed]', err);
       }
-      setTimeout(resetState, 4000);
+      setTimeout(resetState, 6000);
     }
   });
 
-  function setState(cls, label) {
+  function setState(cls, label, title) {
     btn.className = `sc-button sc-button-secondary sc-button-medium gpd-btn gpd-${cls}`;
     btn.querySelector('.sc-button-label').textContent = label;
+    if (title) btn.title = title;
   }
 
   function resetState() {
     btn.className = 'sc-button sc-button-secondary sc-button-medium gpd-btn';
     btn.querySelector('.sc-button-label').textContent = 'Download';
+    btn.title = 'Download via Gopeed';
   }
 
   return btn;

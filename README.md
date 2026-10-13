@@ -38,6 +38,10 @@ Click the extension icon in the Chrome toolbar to open settings.
 
 **"Extension context invalidated"** — Refresh the SoundCloud page. This happens after reloading the extension.
 
-**"Failed to fetch"** — Gopeed is not running or the API is not accessible. Make sure Gopeed is open and the port is correct.
+Errors are shown on the button (hover it for the full reason) and as a system notification.
 
-**Downloaded file is HTML, not audio** — The `gopeed-extension-soundcloud` extension is not installed or not updated inside Gopeed.
+**"✗ Gopeed not running"** — Nothing answers on the API port. Start Gopeed; if it is already running, check the port in Gopeed → Settings → Advanced → API and in this extension's popup.
+
+**"✗ Bad API token"** — Gopeed has an API token set. Enter the same token in this extension's popup.
+
+**"✗ Gopeed extension"** — The [gopeed-extension-soundcloud](https://github.com/TropinAlexey/gopeed-extension-soundcloud) extension is not installed in Gopeed, is outdated, or failed on this track. Install/update it in Gopeed → Extensions and check Gopeed's `logs/extension.log`. Keep only one SoundCloud extension installed — duplicates run on every link.
