@@ -3,6 +3,8 @@ name: Deploy to Chrome Web Store
 on:
   push:
     branches: [main]
+    # Docs, store assets and CI-only changes don't change the packaged extension
+    paths-ignore: ['**.md', 'store/**', '.github/**']
 
 jobs:
   deploy:
